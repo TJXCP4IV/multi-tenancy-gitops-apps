@@ -54,51 +54,52 @@ spec:
           echo -n `yq e "$exp // \"\" " $properties_yaml_path` > $result_path
         }
 
-        resolve_props '.integrationServer.project' $(results.is-project.path)
-        resolve_prop '.integrationServer.applicationName' $(results.is-application-name.path)
-        resolve_prop '.integrationServer.releaseName' $(results.is-release-name.path)
-        resolve_prop '.integrationServer.endpoint-path' $(results.endpoint-path.path)
-        resolve_props '.integrationServer.configurations.keystore' $(results.is-configuration-keystore.path)
-        resolve_props '.integrationServer.configurations.truststore' $(results.is-configuration-truststore.path)
-        resolve_props '.integrationServer.configurations.setdbparms' $(results.is-configuration-setdbparms.path)
-        resolve_props '.integrationServer.configurations.serverconf' $(results.is-configuration-serverconf.path)
-        resolve_props '.integrationServer.configurations.policyproject' $(results.is-configuration-policyproject.path)
-        resolve_props '.integrationServer.configurations.loopbackdatasource' $(results.is-configuration-loopbackdatasource.path)
+        resolve_props '.integrationServer.project' /tekton/results/is-project
+        resolve_prop '.integrationServer.applicationName' /tekton/results/is-application-name
+        resolve_prop '.integrationServer.releaseName' /tekton/results/is-release-name
+        resolve_prop '.integrationServer.endpoint-path' /tekton/results/endpoint-path
+        resolve_props '.integrationServer.configurations.keystore' /tekton/results/is-configuration-keystore
+        resolve_props '.integrationServer.configurations.truststore' /tekton/results/is-configuration-truststore
+        resolve_props '.integrationServer.configurations.setdbparms' /tekton/results/is-configuration-setdbparms
+        resolve_props '.integrationServer.configurations.serverconf' /tekton/results/is-configuration-serverconf
+        resolve_props '.integrationServer.configurations.policyproject' /tekton/results/is-configuration-policyproject
+        resolve_props '.integrationServer.configurations.loopbackdatasource' /tekton/results/is-configuration-loopbackdatasource
 
-        resolve_prop '.mq.queueName' $(results.mq-queue-name.path)
-        resolve_prop '.mq.endPointPolicyFile' $(results.mq-end-point-policy-file.path)
+        resolve_prop '.mq.queueName' /tekton/results/mq-queue-name
+        resolve_prop '.mq.endPointPolicyFile' /tekton/results/mq-end-point-policy-file
 
-        resolve_props '.integrationServer.configurations.*' $(results.is-configurations.path)
+        resolve_props '.integrationServer.configurations.*' /tekton/results/is-configurations
 
-        resolve_prop '.integrationServer.license.license' $(results.is-license.path)
-        resolve_prop '.integrationServer.license.use' $(results.is-license-use.path)
-        resolve_prop '.integrationServer.service.endpointType' $(results.is-service-endpoint-type.path)
-        resolve_prop '.integrationServer.version' $(results.is-version.path)
-        resolve_prop '.integrationServer.baseImage' $(results.is-base-image.path)
+        resolve_prop '.integrationServer.license.license' /tekton/results/is-license
+        resolve_prop '.integrationServer.license.use' /tekton/results/is-license-use
+        resolve_prop '.integrationServer.service.endpointType' /tekton/results/is-service-endpoint-type
+        resolve_prop '.integrationServer.version' /tekton/results/is-version
+        resolve_prop '.integrationServer.baseImage' /tekton/results/is-base-image
 
     - name: resolve-ocp-properties
       image: quay.io/openshift/origin-cli:latest
       script: |
         
-        release_name=$(cat $(results.release-name.path))
+        release_name=$(cat /tekton/results/is-release-name)
         echo $release_name
 
         set +e
         previous_is_genenration=$(oc get integrationserver \
                 $release_name -o jsonpath='{.metadata.generation}' 2>/dev/null)
-        set +e
+        set -e
 
-        echo -n $previous_is_genenration > $(results.previous-is-genenration.path)
+        echo -n $previous_is_genenration > /tekton/results/previous-is-genenration
 
         if [[ ! -z $previous_is_genenration ]]; then
           oc get deployment \
                 -l app.kubernetes.io/instance=$release_name \
-                -o jsonpath='{$.items[0].metadata.annotations.deployment\.kubernetes\.io/revision}' 2>/dev/null > $(results.previous-deployment-revision.path)
+                -o jsonpath='{$.items[0].metadata.annotations.deployment\\.kubernetes\\.io/revision}' 2>/dev/null > /tekton/results/previous-deployment-revision
         else
-          touch $(results.previous-deployment-revision.path)
+          touch /tekton/results/previous-deployment-revision
         fi
 
-        echo -n $(oc registry info) > $(results.registry-host.path)
+        echo -n $(oc registry info) > /tekton/results/registry-host
 
   workspaces:
     - name: input
+

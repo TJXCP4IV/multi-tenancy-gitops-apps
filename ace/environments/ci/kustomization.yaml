@@ -22,7 +22,7 @@ resources:
  - roles/custom-images-builder-rolebinding.yaml
 # - roles/custom-pipeline-clusterrole.yaml
 # - roles/custom-pipeline-clusterrolebinding.yaml
-# - routes/el-ace-integration-server.yaml
+ - routes/el-ace-integration-server.yaml
  - secrets/ibm-entitlement-key-secret.yaml
  - secrets/gitops-repo-pk-secret-create-customer-at-github.yaml
 # - secrets/basic-auth-rest-secret.yaml

@@ -1,4 +1,5 @@
 resources:
+ - secrets/gitops-webhook-token.yaml
  - certificates/prod-ref-devops.yaml
  - certificates/prod-ref-ss-ca.yaml
  - buildconfig/sh-tools.yaml
